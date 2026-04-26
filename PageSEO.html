@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PageSEO Analyzer – Free Page Speed Test | Acceio Media</title>
+<meta name="description" content="Free page speed and SEO analyzer powered by Google Lighthouse. Test any website's performance, accessibility, SEO, and Core Web Vitals instantly."/>
+<link rel="canonical" href="https://acceio.com/PageSEO"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+
+:root{
+  --bg:       #0a0a0a;
+  --bg2:      #111;
+  --bg3:      #1a1a1a;
+  --card:     #141414;
+  --border:   rgba(255,255,255,.08);
+  --border2:  rgba(255,255,255,.14);
+  --text:     #f0f0ef;
+  --text2:    #999;
+  --text3:    #555;
+  --lime:     #c8ff3e;
+  --lime-dk:  #a3d12a;
+  --good:     #22c55e;
+  --warn:     #f59e0b;
+  --bad:      #ef4444;
+  --avg:      #f97316;
+  --blue:     #3b82f6;
+  --r:        12px;
+  --r-sm:     7px;
+  --max:      1100px;
+}
+
+body{font-family:'Instrument Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+h1,h2,h3{font-family:'Syne',sans-serif;line-height:1.1;letter-spacing:-.02em}
+a{text-decoration:none;color:inherit}
+.container{max-width:var(--max);margin:0 auto;padding:0 24px}
+code,pre,.mono{font-family:'DM Mono',monospace}
+
+/* ── NAV ── */
+.nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(10,10,10,.9);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  height:56px;display:flex;align-items:center;
+}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;width:100%}
+.nav-brand{
+  display:flex;align-items:center;gap:8px;
+  font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;
+}
+.nav-mark{width:26px;height:26px;background:var(--lime);border-radius:6px;display:grid;place-items:center;color:#000;font-weight:800;font-size:.75rem}
+.nav-right{display:flex;align-items:center;gap:10px;font-size:.83rem;color:var(--text2)}
+.nav-right a:hover{color:var(--text)}
+.nav-badge{
+  background:rgba(200,255,62,.1);border:1px solid rgba(200,255,62,.2);
+  color:var(--lime);font-size:.68rem;font-weight:700;
+  padding:3px 10px;border-radius:20px;letter-spacing:.05em;text-transform:uppercase;
+}
+
+/* ── HERO ── */
+.hero{
+  padding:72px 0 60px;text-align:center;position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;top:-50%;left:50%;transform:translateX(-50%);
+  width:800px;height:800px;
+  background:radial-gradient(circle,rgba(200,255,62,.06) 0%,transparent 60%);
+  pointer-events:none;
+}
+.hero-label{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  background:rgba(200,255,62,.07);border:1px solid rgba(200,255,62,.15);
+  padding:5px 14px;border-radius:20px;color:var(--lime);margin-bottom:22px;
+}
+.hero h1{
+  font-size:clamp(2.4rem,5vw,4rem);
+  margin-bottom:16px;
+  background:linear-gradient(180deg,var(--text) 60%,var(--text3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero-sub{
+  font-size:1rem;color:var(--text2);max-width:500px;margin:0 auto 40px;line-height:1.7;
+}
+
+/* ── SEARCH BAR ── */
+.search-wrap{
+  max-width:680px;margin:0 auto;position:relative;
+}
+.search-form{
+  display:flex;gap:0;
+  background:var(--card);border:1px solid var(--border2);border-radius:var(--r);
+  overflow:hidden;transition:border-color .2s,box-shadow .2s;
+}
+.search-form:focus-within{
+  border-color:rgba(200,255,62,.4);
+  box-shadow:0 0 0 3px rgba(200,255,62,.06);
+}
+.device-toggle{
+  display:flex;border-right:1px solid var(--border);flex-shrink:0;
+}
+.device-btn{
+  padding:0 14px;font-size:.8rem;font-weight:600;color:var(--text3);
+  background:none;border:none;cursor:pointer;transition:all .15s;
+  font-family:'Instrument Sans',sans-serif;display:flex;align-items:center;gap:5px;
+}
+.device-btn.active{background:rgba(200,255,62,.08);color:var(--lime)}
+.device-btn:hover:not(.active){color:var(--text2)}
+.url-input{
+  flex:1;background:none;border:none;outline:none;
+  padding:14px 16px;font-size:.95rem;color:var(--text);
+  font-family:'Instrument Sans',sans-serif;
+}
+.url-input::placeholder{color:var(--text3)}
+.analyze-btn{
+  background:var(--lime);color:#000;border:none;
+  padding:12px 24px;font-weight:700;font-size:.88rem;
+  cursor:pointer;transition:background .15s,transform .15s;
+  font-family:'Syne',sans-serif;letter-spacing:.03em;
+  border-radius:0 var(--r-sm) var(--r-sm) 0;
+  white-space:nowrap;
+}
+.analyze-btn:hover{background:var(--lime-dk)}
+.analyze-btn:disabled{background:#333;color:#666;cursor:not-allowed;transform:none}
+
+.url-error{
+  font-size:.78rem;color:var(--bad);margin-top:8px;text-align:left;
+  display:none;padding-left:4px;
+}
+
+/* categories row */
+.cat-row{
+  display:flex;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap;
+}
+.cat-chip{
+  display:flex;align-items:center;gap:5px;
+  font-size:.72rem;font-weight:600;padding:4px 12px;border-radius:20px;
+  cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--text2);
+  transition:all .15s;user-select:none;
+}
+.cat-chip.on{border-color:rgba(200,255,62,.3);background:rgba(200,255,62,.08);color:var(--lime)}
+.cat-dot{width:8px;height:8px;border-radius:50%}
+
+/* ── LOADING ── */
+.loading-wrap{
+  display:none;text-align:center;padding:60px 0;
+}
+.loading-wrap.show{display:block}
+.spinner{
+  width:48px;height:48px;border:3px solid var(--border);
+  border-top-color:var(--lime);border-radius:50%;
+  animation:spin 1s linear infinite;margin:0 auto 20px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-url{font-size:.95rem;font-weight:600;color:var(--text);margin-bottom:6px}
+.loading-sub{font-size:.82rem;color:var(--text2)}
+.loading-steps{
+  display:flex;flex-direction:column;gap:6px;
+  max-width:320px;margin:24px auto 0;text-align:left;
+}
+.loading-step{
+  font-size:.78rem;color:var(--text3);display:flex;align-items:center;gap:8px;
+  transition:color .3s;
+}
+.loading-step.done{color:var(--good)}
+.loading-step.active{color:var(--lime)}
+.step-dot{
+  width:6px;height:6px;border-radius:50%;background:currentColor;
+  flex-shrink:0;
+}
+
+/* ── RESULTS ── */
+.results-wrap{display:none}
+.results-wrap.show{display:block}
+
+/* Tested URL bar */
+.tested-bar{
+  display:flex;align-items:center;gap:10px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r-sm);padding:10px 16px;
+  margin-bottom:24px;font-size:.84rem;
+}
+.tested-device{
+  font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+  background:rgba(200,255,62,.1);color:var(--lime);padding:2px 8px;border-radius:20px;
+}
+.tested-url{color:var(--text2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.retest-btn{
+  background:none;border:1px solid var(--border2);color:var(--text2);
+  padding:5px 12px;border-radius:var(--r-sm);font-size:.75rem;font-weight:600;
+  cursor:pointer;transition:all .15s;font-family:'Instrument Sans',sans-serif;
+}
+.retest-btn:hover{border-color:var(--lime);color:var(--lime)}
+
+/* Score cards */
+.scores-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:12px;margin-bottom:24px;
+}
+.score-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+  padding:22px 18px;text-align:center;position:relative;overflow:hidden;
+  transition:border-color .2s;
+}
+.score-card:hover{border-color:var(--border2)}
+.score-ring-wrap{
+  width:80px;height:80px;margin:0 auto 12px;position:relative;
+}
+svg.ring{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--bg3);stroke-width:7}
+.ring-fill{fill:none;stroke-width:7;stroke-linecap:round;transition:stroke-dashoffset .8s ease}
+.score-num{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:800;
+}
+.score-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text2)}
+
+/* Colour helpers */
+.c-good{color:var(--good)} .c-warn{color:var(--warn)} .c-bad{color:var(--bad)} .c-avg{color:var(--avg)}
+.bg-good{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.2)} 
+.bg-warn{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.2)}
+.bg-bad{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.2)}
+
+/* Core Web Vitals */
+.section-title{
+  display:flex;align-items:center;gap:8px;
+  font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;
+  margin-bottom:14px;
+}
+.section-title::before{content:'';display:inline-block;width:14px;height:2px;background:var(--lime)}
+
+.cwv-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;
+}
+.cwv-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+  padding:18px 16px;
+}
+.cwv-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+.cwv-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text2)}
+.cwv-val{font-family:'DM Mono',monospace;font-size:1.4rem;font-weight:500;margin-bottom:4px}
+.cwv-desc{font-size:.72rem;color:var(--text3);line-height:1.4}
+.cwv-bar{height:4px;background:var(--bg3);border-radius:4px;margin-top:10px;overflow:hidden}
+.cwv-bar-fill{height:100%;border-radius:4px;transition:width .8s ease}
+
+/* Audits */
+.audits-wrap{
+  display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;
+}
+.audit-group{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;
+}
+.audit-group-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;border-bottom:1px solid var(--border);
+}
+.audit-group-title{font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.audit-list{display:flex;flex-direction:column}
+.audit-item{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:12px 18px;border-bottom:1px solid var(--border);
+  transition:background .15s;
+}
+.audit-item:last-child{border-bottom:none}
+.audit-item:hover{background:var(--bg3)}
+.audit-icon{
+  width:20px;height:20px;border-radius:50%;display:grid;place-items:center;
+  font-size:.65rem;flex-shrink:0;margin-top:1px;
+}
+.ai-good{background:rgba(34,197,94,.15);color:var(--good)}
+.ai-warn{background:rgba(245,158,11,.15);color:var(--warn)}
+.ai-bad{background:rgba(239,68,68,.15);color:var(--bad)}
+.ai-info{background:rgba(59,130,246,.15);color:var(--blue)}
+.audit-content{flex:1;min-width:0}
+.audit-title{font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.audit-desc{font-size:.72rem;color:var(--text3);line-height:1.4}
+.audit-val{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--text2);white-space:nowrap;flex-shrink:0}
+
+/* Opportunities */
+.opps-list{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+  margin-bottom:24px;overflow:hidden;
+}
+.opp-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;border-bottom:1px solid var(--border);
+  gap:12px;transition:background .15s;
+}
+.opp-item:last-child{border-bottom:none}
+.opp-item:hover{background:var(--bg3)}
+.opp-left{display:flex;align-items:flex-start;gap:12px;flex:1;min-width:0}
+.opp-icon{font-size:1rem;flex-shrink:0;margin-top:1px}
+.opp-title{font-size:.84rem;font-weight:600;color:var(--text);margin-bottom:2px}
+.opp-desc{font-size:.73rem;color:var(--text3);line-height:1.4}
+.opp-savings{
+  font-family:'DM Mono',monospace;font-size:.78rem;font-weight:500;
+  padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0;
+}
+.sav-good{background:rgba(34,197,94,.1);color:var(--good)}
+.sav-warn{background:rgba(245,158,11,.1);color:var(--warn)}
+.sav-bad{background:rgba(239,68,68,.1);color:var(--bad)}
+
+/* Quick facts row */
+.facts-row{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;
+}
+.fact-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+  padding:16px;text-align:center;
+}
+.fact-val{font-family:'DM Mono',monospace;font-size:1.15rem;font-weight:500;margin-bottom:4px}
+.fact-lbl{font-size:.7rem;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+
+/* CTA banner */
+.cta-banner{
+  background:linear-gradient(135deg,rgba(200,255,62,.06),rgba(200,255,62,.02));
+  border:1px solid rgba(200,255,62,.15);border-radius:var(--r);
+  padding:28px 32px;display:flex;align-items:center;justify-content:space-between;
+  gap:20px;flex-wrap:wrap;margin-bottom:40px;
+}
+.cta-banner h3{font-size:1.05rem;margin-bottom:6px}
+.cta-banner p{font-size:.84rem;color:var(--text2);line-height:1.5;max-width:480px}
+.btn-lime{
+  background:var(--lime);color:#000;font-weight:700;font-size:.88rem;
+  padding:11px 22px;border-radius:24px;white-space:nowrap;transition:background .15s;
+  font-family:'Syne',sans-serif;border:none;cursor:pointer;
+}
+.btn-lime:hover{background:var(--lime-dk)}
+
+/* Footer */
+.page-footer{
+  text-align:center;padding:32px 0 40px;
+  border-top:1px solid var(--border);
+  font-size:.78rem;color:var(--text3);
+}
+.page-footer a{color:var(--text2);transition:color .15s}
+.page-footer a:hover{color:var(--lime)}
+
+/* Empty / error states */
+.error-wrap{
+  display:none;text-align:center;padding:60px 20px;
+}
+.error-wrap.show{display:block}
+.error-icon{font-size:2.5rem;margin-bottom:14px}
+.error-title{font-size:1rem;font-weight:700;margin-bottom:8px}
+.error-msg{font-size:.85rem;color:var(--text2);line-height:1.6;max-width:440px;margin:0 auto}
+.retry-btn{
+  display:inline-flex;margin-top:18px;background:var(--lime);color:#000;
+  font-weight:700;padding:10px 22px;border-radius:24px;font-size:.86rem;cursor:pointer;border:none;
+  font-family:'Instrument Sans',sans-serif;
+}
+
+/* Responsive */
+@media(max-width:768px){
+  .scores-grid{grid-template-columns:repeat(2,1fr)}
+  .cwv-grid{grid-template-columns:1fr}
+  .audits-wrap{grid-template-columns:1fr}
+  .facts-row{grid-template-columns:repeat(2,1fr)}
+  .device-toggle{display:none}
+  .cta-banner{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="https://acceio.com" class="nav-brand">
+        <div class="nav-mark">A</div>
+        Acceio Media
+      </a>
+      <div class="nav-right">
+        <a href="https://acceio.com">Home</a>
+        <a href="https://acceio.com#pricing">Pricing</a>
+        <a href="https://dashboard.acceio.com" target="_blank">Dashboard</a>
+        <span class="nav-badge">Free Tool</span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO + SEARCH -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-label">⚡ Powered by Google Lighthouse</div>
+    <h1>PageSEO Analyzer</h1>
+    <p class="hero-sub">Test any website's performance, SEO, accessibility, and Core Web Vitals — free, instant, powered by Google.</p>
+
+    <div class="search-wrap">
+      <div class="search-form">
+        <div class="device-toggle">
+          <button class="device-btn active" id="btnMobile" onclick="setDevice('mobile')">📱 Mobile</button>
+          <button class="device-btn" id="btnDesktop" onclick="setDevice('desktop')">🖥 Desktop</button>
+        </div>
+        <input
+          class="url-input" id="urlInput" type="url"
+          placeholder="https://yourwebsite.com"
+          autocomplete="url" autocorrect="off" autocapitalize="none" spellcheck="false"
+        />
+        <button class="analyze-btn" id="analyzeBtn" onclick="runAnalysis()">Analyze →</button>
+      </div>
+      <div class="url-error" id="urlError">Please enter a valid URL starting with https://</div>
+    </div>
+
+    <div class="cat-row">
+      <div class="cat-chip on" data-cat="performance" onclick="toggleCat(this)">
+        <span class="cat-dot" style="background:var(--blue)"></span>Performance
+      </div>
+      <div class="cat-chip on" data-cat="accessibility" onclick="toggleCat(this)">
+        <span class="cat-dot" style="background:var(--good)"></span>Accessibility
+      </div>
+      <div class="cat-chip on" data-cat="best-practices" onclick="toggleCat(this)">
+        <span class="cat-dot" style="background:var(--warn)"></span>Best Practices
+      </div>
+      <div class="cat-chip on" data-cat="seo" onclick="toggleCat(this)">
+        <span class="cat-dot" style="background:var(--lime)"></span>SEO
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOADING -->
+<div class="loading-wrap container" id="loadingWrap">
+  <div class="spinner"></div>
+  <div class="loading-url" id="loadingUrl"></div>
+  <div class="loading-sub">Running Lighthouse audit — usually takes 15–30 seconds</div>
+  <div class="loading-steps">
+    <div class="loading-step" id="step1"><span class="step-dot"></span>Connecting to Google Lighthouse…</div>
+    <div class="loading-step" id="step2"><span class="step-dot"></span>Loading page in simulated environment…</div>
+    <div class="loading-step" id="step3"><span class="step-dot"></span>Measuring Core Web Vitals…</div>
+    <div class="loading-step" id="step4"><span class="step-dot"></span>Running SEO & accessibility checks…</div>
+    <div class="loading-step" id="step5"><span class="step-dot"></span>Generating recommendations…</div>
+  </div>
+</div>
+
+<!-- ERROR -->
+<div class="error-wrap container" id="errorWrap">
+  <div class="error-icon">⚠️</div>
+  <div class="error-title">Analysis failed</div>
+  <div class="error-msg" id="errorMsg">Something went wrong. Please check the URL and try again.</div>
+  <button class="retry-btn" onclick="reset()">Try another URL</button>
+</div>
+
+<!-- RESULTS -->
+<div class="results-wrap container" id="resultsWrap">
+
+  <!-- Tested URL bar -->
+  <div class="tested-bar">
+    <span id="testedDevice" class="tested-device">Mobile</span>
+    <span id="testedUrl" class="tested-url">—</span>
+    <button class="retest-btn" onclick="reset()">← Test another URL</button>
+  </div>
+
+  <!-- Score rings -->
+  <div class="scores-grid" id="scoresGrid"></div>
+
+  <!-- Quick Facts -->
+  <div class="section-title">📊 Page Overview</div>
+  <div class="facts-row" id="factsRow"></div>
+
+  <!-- Core Web Vitals -->
+  <div class="section-title">💫 Core Web Vitals</div>
+  <div class="cwv-grid" id="cwvGrid"></div>
+
+  <!-- Opportunities (save time) -->
+  <div id="oppsSection" style="display:none">
+    <div class="section-title">🚀 Opportunities to Improve</div>
+    <div class="opps-list" id="oppsList"></div>
+  </div>
+
+  <!-- Audits grid -->
+  <div class="section-title">🔍 Detailed Audits</div>
+  <div class="audits-wrap" id="auditsWrap"></div>
+
+  <!-- CTA -->
+  <div class="cta-banner">
+    <div>
+      <h3>Want us to fix these issues for you?</h3>
+      <p>Acceio Media's SEO & Performance team can implement every recommendation above — faster load times, better rankings, more conversions.</p>
+    </div>
+    <a href="https://acceio.com#contact" class="btn-lime">Get a Free Audit →</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="page-footer">
+  <div class="container">
+    <p>Built by <a href="https://acceio.com">Acceio Media</a> · Powered by <a href="https://pagespeed.web.dev" target="_blank">Google PageSpeed Insights API</a> · Free, no login required</p>
+    <p style="margin-top:6px">Data from Google Lighthouse. Results may vary from real-world performance.</p>
+  </div>
+</footer>
+
+<script>
+// ── State ──
+let device = 'mobile';
+let activeCategories = new Set(['performance','accessibility','best-practices','seo']);
+
+function setDevice(d) {
+  device = d;
+  document.getElementById('btnMobile').classList.toggle('active',  d === 'mobile');
+  document.getElementById('btnDesktop').classList.toggle('active', d === 'desktop');
+}
+
+function toggleCat(el) {
+  const cat = el.dataset.cat;
+  if (activeCategories.has(cat)) {
+    if (activeCategories.size === 1) return; // always keep at least one
+    activeCategories.delete(cat);
+    el.classList.remove('on');
+  } else {
+    activeCategories.add(cat);
+    el.classList.add('on');
+  }
+}
+
+// ── Enter key ──
+document.getElementById('urlInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') runAnalysis();
+});
+
+// ── Main analysis function ──
+async function runAnalysis() {
+  let url = document.getElementById('urlInput').value.trim();
+  const errEl = document.getElementById('urlError');
+  errEl.style.display = 'none';
+
+  // Auto-prepend https if missing
+  if (url && !url.startsWith('http')) url = 'https://' + url;
+
+  if (!url || !/^https?:\/\/.+\..+/.test(url)) {
+    errEl.style.display = 'block';
+    return;
+  }
+
+  // UI states
+  document.getElementById('loadingWrap').classList.add('show');
+  document.getElementById('resultsWrap').classList.remove('show');
+  document.getElementById('errorWrap').classList.remove('show');
+  document.getElementById('analyzeBtn').disabled = true;
+  document.getElementById('loadingUrl').textContent = url;
+
+  // Animate loading steps
+  const steps = [1,2,3,4,5];
+  steps.forEach(i => {
+    const el = document.getElementById('step'+i);
+    el.classList.remove('done','active');
+  });
+  let stepIdx = 0;
+  const stepTimer = setInterval(() => {
+    if (stepIdx > 0) document.getElementById('step'+stepIdx).classList.replace('active','done');
+    stepIdx++;
+    if (stepIdx <= steps.length) document.getElementById('step'+stepIdx).classList.add('active');
+    else clearInterval(stepTimer);
+  }, 4000);
+
+  try {
+    // Build API URL — call all 4 categories
+    const cats = [...activeCategories].map(c => `category=${c}`).join('&');
+    const apiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=${device}&${cats}`;
+    const res  = await fetch(apiUrl);
+    const data = await res.json();
+
+    clearInterval(stepTimer);
+    steps.forEach(i => document.getElementById('step'+i).classList.add('done'));
+
+    if (data.error) throw new Error(data.error.message || 'API error');
+
+    setTimeout(() => renderResults(data, url), 300);
+  } catch(err) {
+    clearInterval(stepTimer);
+    document.getElementById('loadingWrap').classList.remove('show');
+    document.getElementById('errorWrap').classList.add('show');
+    document.getElementById('errorMsg').textContent =
+      err.message.includes('fetch') ? 'Could not reach the Google PageSpeed API. Check your connection.' :
+      err.message.includes('INVALID_URL') ? 'Invalid URL. Make sure the website exists and is publicly accessible.' :
+      err.message || 'Analysis failed. Please try again.';
+    document.getElementById('analyzeBtn').disabled = false;
+  }
+}
+
+// ── Render results ──
+function renderResults(data, url) {
+  document.getElementById('loadingWrap').classList.remove('show');
+  document.getElementById('resultsWrap').classList.add('show');
+  document.getElementById('analyzeBtn').disabled = false;
+
+  document.getElementById('testedUrl').textContent    = url;
+  document.getElementById('testedDevice').textContent = device === 'mobile' ? '📱 Mobile' : '🖥 Desktop';
+
+  const lh   = data.lighthouseResult || {};
+  const cats = lh.categories || {};
+  const auds = lh.audits || {};
+
+  renderScores(cats);
+  renderFacts(lh, auds);
+  renderCWV(auds);
+  renderOpportunities(auds);
+  renderAudits(auds, cats);
+}
+
+// ── Score rings ──
+function renderScores(cats) {
+  const order = ['performance','accessibility','best-practices','seo'];
+  const labels = {performance:'Performance',accessibility:'Accessibility','best-practices':'Best Practices',seo:'SEO'};
+  const circumference = 2 * Math.PI * 34; // r=34
+
+  document.getElementById('scoresGrid').innerHTML = order.map(key => {
+    if (!cats[key]) return '';
+    const score = Math.round((cats[key].score || 0) * 100);
+    const color = scoreColor(score);
+    const offset = circumference - (score / 100) * circumference;
+    return `
+    <div class="score-card">
+      <div class="score-ring-wrap">
+        <svg class="ring" width="80" height="80" viewBox="0 0 80 80">
+          <circle class="ring-bg" cx="40" cy="40" r="34"/>
+          <circle class="ring-fill" cx="40" cy="40" r="34"
+            stroke="${color}"
+            stroke-dasharray="${circumference}"
+            stroke-dashoffset="${offset}"
+            id="ring-${key}"/>
+        </svg>
+        <div class="score-num" style="color:${color}">${score}</div>
+      </div>
+      <div class="score-label">${labels[key]||key}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Quick facts ──
+function renderFacts(lh, auds) {
+  const meta      = lh.configSettings || {};
+  const fcp       = auds['first-contentful-paint'];
+  const si        = auds['speed-index'];
+  const lcp       = auds['largest-contentful-paint'];
+  const totalBytes = auds['total-byte-weight'];
+
+  const facts = [
+    { val: fcp ? fcp.displayValue : '—', lbl: 'First Contentful Paint' },
+    { val: si  ? si.displayValue  : '—', lbl: 'Speed Index' },
+    { val: lcp ? lcp.displayValue : '—', lbl: 'Largest Contentful Paint' },
+    { val: totalBytes ? formatBytes(totalBytes.numericValue) : '—', lbl: 'Total Page Size' },
+  ];
+  document.getElementById('factsRow').innerHTML = facts.map(f => `
+    <div class="fact-card">
+      <div class="fact-val">${f.val}</div>
+      <div class="fact-lbl">${f.lbl}</div>
+    </div>`).join('');
+}
+
+// ── Core Web Vitals ──
+function renderCWV(auds) {
+  const vitals = [
+    { key:'largest-contentful-paint', label:'Largest Contentful Paint', desc:'Time for largest visible element to load', good:2500, bad:4000, unit:'ms' },
+    { key:'total-blocking-time',      label:'Total Blocking Time',       desc:'Sum of blocking time between FCP and TTI', good:200, bad:600, unit:'ms' },
+    { key:'cumulative-layout-shift',  label:'Cumulative Layout Shift',   desc:'Visual stability — unexpected layout shifts', good:.1, bad:.25, unit:'' },
+    { key:'interaction-to-next-paint',label:'Interaction to Next Paint', desc:'Responsiveness to user interactions', good:200, bad:500, unit:'ms' },
+    { key:'speed-index',              label:'Speed Index',               desc:'How quickly content is visually displayed', good:3400, bad:5800, unit:'ms' },
+    { key:'first-contentful-paint',   label:'First Contentful Paint',    desc:'When first text or image appears', good:1800, bad:3000, unit:'ms' },
+  ];
+
+  document.getElementById('cwvGrid').innerHTML = vitals.map(v => {
+    const a = auds[v.key];
+    if (!a) return '';
+    const score   = a.score !== null ? Math.round(a.score * 100) : null;
+    const color   = score !== null ? scoreColor(score) : 'var(--text3)';
+    const barPct  = score !== null ? score : 0;
+    const label   = scoreLabel(score);
+    return `
+    <div class="cwv-card">
+      <div class="cwv-top">
+        <div class="cwv-label">${v.label}</div>
+        <span style="font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:20px;
+          background:${score>=90?'rgba(34,197,94,.1)':score>=50?'rgba(245,158,11,.1)':'rgba(239,68,68,.1)'};
+          color:${color}">${label}</span>
+      </div>
+      <div class="cwv-val" style="color:${color}">${a.displayValue||'—'}</div>
+      <div class="cwv-desc">${v.desc}</div>
+      <div class="cwv-bar"><div class="cwv-bar-fill" style="width:${barPct}%;background:${color}"></div></div>
+    </div>`;
+  }).filter(Boolean).join('');
+}
+
+// ── Opportunities ──
+function renderOpportunities(auds) {
+  const opps = Object.values(auds).filter(a =>
+    a.details && a.details.type === 'opportunity' && a.numericValue > 0 && a.score < 1
+  ).sort((a,b) => b.numericValue - a.numericValue).slice(0, 8);
+
+  if (!opps.length) { document.getElementById('oppsSection').style.display = 'none'; return; }
+  document.getElementById('oppsSection').style.display = 'block';
+  document.getElementById('oppsList').innerHTML = opps.map(a => {
+    const savings  = a.displayValue || '';
+    const score    = a.score !== null ? Math.round(a.score * 100) : 0;
+    const savClass = score < 49 ? 'sav-bad' : score < 89 ? 'sav-warn' : 'sav-good';
+    return `
+    <div class="opp-item">
+      <div class="opp-left">
+        <div class="opp-icon">${score < 49 ? '🔴' : '🟡'}</div>
+        <div>
+          <div class="opp-title">${esc(a.title||'')}</div>
+          <div class="opp-desc">${esc(truncate(a.description||'',140))}</div>
+        </div>
+      </div>
+      ${savings ? `<span class="opp-savings ${savClass}">${esc(savings)}</span>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ── Audits grid ──
+function renderAudits(auds, cats) {
+  // Group audits by category
+  const groups = {};
+  Object.entries(cats).forEach(([catKey, cat]) => {
+    if (!cat.auditRefs) return;
+    const catLabel = { performance:'Performance', accessibility:'Accessibility', 'best-practices':'Best Practices', seo:'SEO' }[catKey] || catKey;
+    const items = cat.auditRefs
+      .map(ref => auds[ref.id])
+      .filter(a => a && a.scoreDisplayMode !== 'notApplicable' && a.scoreDisplayMode !== 'manual')
+      .filter(a => a.score !== null && a.score !== 1) // only show non-perfect
+      .sort((a,b) => (a.score||0) - (b.score||0))
+      .slice(0, 10);
+    if (items.length) groups[catLabel] = items;
+  });
+
+  const wrap = document.getElementById('auditsWrap');
+  wrap.innerHTML = Object.entries(groups).map(([groupName, items]) => `
+    <div class="audit-group">
+      <div class="audit-group-header">
+        <div class="audit-group-title">${groupName}</div>
+        <div style="font-size:.72rem;color:var(--text3)">${items.length} checks</div>
+      </div>
+      <div class="audit-list">
+        ${items.map(a => {
+          const score = a.score !== null ? Math.round(a.score * 100) : null;
+          const iconClass = score === null ? 'ai-info' : score >= 90 ? 'ai-good' : score >= 50 ? 'ai-warn' : 'ai-bad';
+          const icon = score === null ? 'ℹ' : score >= 90 ? '✓' : score >= 50 ? '!' : '✗';
+          return `
+          <div class="audit-item">
+            <div class="audit-icon ${iconClass}">${icon}</div>
+            <div class="audit-content">
+              <div class="audit-title" title="${esc(a.title||'')}">${esc(a.title||'')}</div>
+              ${a.displayValue ? `<div class="audit-desc">${esc(a.displayValue)}</div>` : ''}
+            </div>
+            ${score !== null ? `<div class="audit-val" style="color:${scoreColor(score)}">${score}</div>` : ''}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`).join('');
+}
+
+// ── Helpers ──
+function scoreColor(s) {
+  if (s === null) return 'var(--text3)';
+  if (s >= 90) return 'var(--good)';
+  if (s >= 50) return 'var(--warn)';
+  return 'var(--bad)';
+}
+function scoreLabel(s) {
+  if (s === null) return '—';
+  if (s >= 90) return 'Good';
+  if (s >= 50) return 'Needs Work';
+  return 'Poor';
+}
+function formatBytes(bytes) {
+  if (!bytes) return '—';
+  if (bytes > 1048576) return (bytes / 1048576).toFixed(1) + ' MB';
+  return (bytes / 1024).toFixed(0) + ' KB';
+}
+function truncate(str, n) { return str.length > n ? str.slice(0, n) + '…' : str; }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function reset() {
+  document.getElementById('resultsWrap').classList.remove('show');
+  document.getElementById('errorWrap').classList.remove('show');
+  document.getElementById('loadingWrap').classList.remove('show');
+  document.getElementById('urlInput').value = '';
+  document.getElementById('analyzeBtn').disabled = false;
+  document.getElementById('urlInput').focus();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Pre-fill from ?url= query param
+(function() {
+  const p = new URLSearchParams(window.location.search);
+  const u = p.get('url');
+  if (u) { document.getElementById('urlInput').value = u; runAnalysis(); }
+})();
+</script>
+</body>
+</html>
